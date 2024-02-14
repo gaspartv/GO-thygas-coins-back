@@ -23,6 +23,9 @@ func main() {
 	accountLoyaltyDB := database.NewAccLoyaltyDB(db)
 	accLoyaltyService := service.NewAccLoyaltyService(*accountLoyaltyDB)
 
+	characterDB := database.NewCharacterDB(db)
+	characterService := service.NewCharacterService(*characterDB)
+
 	c := chi.NewRouter()
 	c.Use(middleware.Logger)
 	c.Use(middleware.Recoverer)
@@ -32,6 +35,12 @@ func main() {
 	c.Delete("/account-loyalty/{id}", accLoyaltyService.Delete)
 	c.Get("/account-loyalty", accLoyaltyService.List)
 	c.Put("/account-loyalty/{id}", accLoyaltyService.Update)
+
+	c.Post("/character", characterService.Create)
+	c.Get("/character/{id}", characterService.Get)
+	c.Delete("/character/{id}", characterService.Delete)
+	c.Get("/character", characterService.List)
+	c.Put("/character/{id}", characterService.Update)
 
 	fmt.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", c); err != nil {

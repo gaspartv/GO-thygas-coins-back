@@ -10,36 +10,45 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type AccLoyaltyService struct {
-	db database.AccLoyaltyDB
+type CharacterService struct {
+	db database.CharacterDB
 }
 
-func NewAccLoyaltyService(db database.AccLoyaltyDB) *AccLoyaltyService {
-	return &AccLoyaltyService{
+func NewCharacterService(db database.CharacterDB) *CharacterService {
+	return &CharacterService{
 		db: db,
 	}
 }
 
-func (handler *AccLoyaltyService) Create(w http.ResponseWriter, r *http.Request) {
-	var accountLoyalty entity.AccLoyalty
+func (handler *CharacterService) Create(w http.ResponseWriter, r *http.Request) {
+	var character entity.Character
 
-	if err := json.NewDecoder(r.Body).Decode(&accountLoyalty); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&character); err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if accountLoyalty.Percentage < 5 || accountLoyalty.Percentage > 50 {
-		handlerError.Exec(w, "percentage should be between 5 to 50 ", http.StatusConflict)
+	if character.Vocation == "" {
+		handlerError.Exec(w, "param vocation is required", http.StatusBadRequest)
+		return
+	}
+	if character.Level == 0 {
+		handlerError.Exec(w, "param level is required", http.StatusBadRequest)
 		return
 	}
 
-	if accountLoyalty.Price <= 0 {
-		handlerError.Exec(w, "price should be greater than 0 ", http.StatusConflict)
+	if character.World == "" {
+		handlerError.Exec(w, "param world is required", http.StatusBadRequest)
 		return
 	}
 
-	accLoyalty := entity.NewAccLoyalty(accountLoyalty.Percentage, accountLoyalty.Price)
-	result, err := handler.db.Create(accLoyalty)
+	if character.Description == "" {
+		handlerError.Exec(w, "param description is required", http.StatusBadRequest)
+		return
+	}
+
+	char := entity.NewCharacter(character.Vocation, character.Level, character.World, character.Description)
+	result, err := handler.db.Create(char)
 	if err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -56,8 +65,8 @@ func (handler *AccLoyaltyService) Create(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (handler *AccLoyaltyService) Update(w http.ResponseWriter, r *http.Request) {
-	var accountLoyalty entity.AccLoyalty
+func (handler *CharacterService) Update(w http.ResponseWriter, r *http.Request) {
+	var character entity.Character
 
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -65,22 +74,32 @@ func (handler *AccLoyaltyService) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&accountLoyalty); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&character); err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if accountLoyalty.Percentage < 5 || accountLoyalty.Percentage > 50 {
-		handlerError.Exec(w, "percentage should be between 5 to 50 ", http.StatusConflict)
+	if character.Vocation == "" {
+		handlerError.Exec(w, "param vocation is required", http.StatusBadRequest)
 		return
 	}
 
-	if accountLoyalty.Price <= 0 {
-		handlerError.Exec(w, "price should be greater than 0 ", http.StatusConflict)
+	if character.Level == 0 {
+		handlerError.Exec(w, "param level is required", http.StatusBadRequest)
 		return
 	}
 
-	result, err := handler.db.Update(id, &accountLoyalty)
+	if character.World == "" {
+		handlerError.Exec(w, "param world is required", http.StatusBadRequest)
+		return
+	}
+
+	if character.Description == "" {
+		handlerError.Exec(w, "param description is required", http.StatusBadRequest)
+		return
+	}
+
+	result, err := handler.db.Update(id, &character)
 	if err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -97,7 +116,7 @@ func (handler *AccLoyaltyService) Update(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (handler *AccLoyaltyService) List(w http.ResponseWriter, r *http.Request) {
+func (handler *CharacterService) List(w http.ResponseWriter, r *http.Request) {
 	result, err := handler.db.List()
 	if err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
@@ -111,7 +130,7 @@ func (handler *AccLoyaltyService) List(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *AccLoyaltyService) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *CharacterService) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		handlerError.Exec(w, "param id is required", http.StatusBadRequest)
@@ -120,7 +139,7 @@ func (handler *AccLoyaltyService) Get(w http.ResponseWriter, r *http.Request) {
 
 	result, err := handler.db.Get(id)
 	if err != nil {
-		handlerError.Exec(w, "account loyalty not found", http.StatusNotFound)
+		handlerError.Exec(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -131,7 +150,7 @@ func (handler *AccLoyaltyService) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handler *AccLoyaltyService) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *CharacterService) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		handlerError.Exec(w, "param id is required", http.StatusBadRequest)
@@ -139,7 +158,7 @@ func (handler *AccLoyaltyService) Delete(w http.ResponseWriter, r *http.Request)
 	}
 
 	if _, err := handler.db.Get(id); err != nil {
-		handlerError.Exec(w, "account loyalty not found", http.StatusNotFound)
+		handlerError.Exec(w, "character not found", http.StatusNotFound)
 		return
 	}
 
