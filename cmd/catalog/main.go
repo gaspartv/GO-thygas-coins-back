@@ -26,6 +26,9 @@ func main() {
 	characterDB := database.NewCharacterDB(db)
 	characterService := service.NewCharacterService(*characterDB)
 
+	storeDB := database.NewStoreDB(db)
+	storeService := service.NewStoreService(*storeDB)
+
 	c := chi.NewRouter()
 	c.Use(middleware.Logger)
 	c.Use(middleware.Recoverer)
@@ -41,6 +44,12 @@ func main() {
 	c.Delete("/character/{id}", characterService.Delete)
 	c.Get("/character", characterService.List)
 	c.Put("/character/{id}", characterService.Update)
+
+	c.Post("/store", storeService.Create)
+	c.Get("/store/{id}", storeService.Get)
+	c.Delete("/store/{id}", storeService.Delete)
+	c.Get("/store", storeService.List)
+	c.Put("/store/{id}", storeService.Update)
 
 	fmt.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", c); err != nil {

@@ -32,6 +32,7 @@ func (handler *CharacterService) Create(w http.ResponseWriter, r *http.Request) 
 		handlerError.Exec(w, "param vocation is required", http.StatusBadRequest)
 		return
 	}
+
 	if character.Level == 0 {
 		handlerError.Exec(w, "param level is required", http.StatusBadRequest)
 		return
@@ -96,6 +97,11 @@ func (handler *CharacterService) Update(w http.ResponseWriter, r *http.Request) 
 
 	if character.Description == "" {
 		handlerError.Exec(w, "param description is required", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := handler.db.Get(id); err != nil {
+		handlerError.Exec(w, "character not found", http.StatusNotFound)
 		return
 	}
 

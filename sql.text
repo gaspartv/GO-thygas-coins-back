@@ -1,0 +1,16 @@
+## ACESSAR O MYSQL DO DOCKER ##
+docker exec -it mysql-thygas-coins mysql -u root -p
+
+## CRIAR DATABASE NO MYSQL ##
+CREATE DATABASE thygas_coins;
+
+## ACESSAR O DATABASE CRIADO ##
+USE thygas_coins;
+
+## CRIAR TABELAS ##
+CREATE TABLE account_loyalty (ID VARCHAR(255), percentage INT, price DECIMAL(10,2));
+CREATE TABLE characters (ID VARCHAR(255), vocation VARCHAR(255), level INT, world VARCHAR(255), description VARCHAR(255));
+CREATE TABLE stores (ID VARCHAR(255), name VARCHAR(255), qrcode VARCHAR(255), email VARCHAR(255), cellphone VARCHAR(255), password VARCHAR(255));
+
+## MOSTRAR TABELAS ##
+SHOW TABLES;
