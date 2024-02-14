@@ -21,6 +21,7 @@ func (database *StoreDB) Create(store *entity.Store) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer stmt.Close()
 
 	if _, err := stmt.Exec(store.ID, store.Name, store.QRCode, store.Email, store.Cellphone, store.Password); err != nil {
 		return "", err
@@ -41,6 +42,7 @@ func (database *StoreDB) Delete(id string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer stmt.Close()
 
 	if _, err := stmt.Exec(id); err != nil {
 		return "", err
@@ -54,6 +56,7 @@ func (database *StoreDB) Update(id string, store *entity.Store) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	defer stmt.Close()
 
 	if _, err := stmt.Exec(store.Name, store.QRCode, store.Email, store.Cellphone, store.Password, id); err != nil {
 		return "", err
@@ -67,6 +70,7 @@ func (database *StoreDB) Get(id string) (*entity.Store, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	row := stmt.QueryRow(id)
 
@@ -83,6 +87,7 @@ func (database *StoreDB) List() ([]entity.Store, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {

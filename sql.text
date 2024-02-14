@@ -11,6 +11,8 @@ USE thygas_coins;
 CREATE TABLE account_loyalty (ID VARCHAR(255), percentage INT, price DECIMAL(10,2));
 CREATE TABLE characters (ID VARCHAR(255), vocation VARCHAR(255), level INT, world VARCHAR(255), description VARCHAR(255));
 CREATE TABLE stores (ID VARCHAR(255), name VARCHAR(255), qrcode VARCHAR(255), email VARCHAR(255), cellphone VARCHAR(255), password VARCHAR(255));
+CREATE TABLE coins (ID VARCHAR(255), code VARCHAR(255), name VARCHAR(255), price DECIMAL(10,2), amount INT, min INT, max INT, image VARCHAR(255), step INT);
+CREATE TABLE promotions (ID VARCHAR(255), description VARCHAR(255), min INT, max INT, price DECIMAL(10,2));
 
 ## MOSTRAR TABELAS ##
 SHOW TABLES;

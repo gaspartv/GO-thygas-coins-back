@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/gaspartv/GO-thygas-coins-back/internal/entity"
 	"github.com/gaspartv/GO-thygas-coins-back/internal/handlerError"
 	"github.com/go-chi/chi/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type StoreService struct {
@@ -20,7 +22,7 @@ func NewStoreService(db database.StoreDB) *StoreService {
 	}
 }
 
-func (handler *StoreService) Create(w http.ResponseWriter, r *http.Request) {
+func (service *StoreService) Create(w http.ResponseWriter, r *http.Request) {
 	var store entity.Store
 
 	if err := json.NewDecoder(r.Body).Decode(&store); err != nil {
@@ -53,8 +55,16 @@ func (handler *StoreService) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s := entity.NewStore(store.Name, store.QRCode, store.Email, store.Cellphone, store.Password)
-	result, err := handler.db.Create(s)
+	hash, err := bcrypt.GenerateFromPassword([]byte(store.Password), bcrypt.DefaultCost)
+	if err != nil {
+		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	passwordHash := base64.StdEncoding.EncodeToString(hash)
+
+	s := entity.NewStore(store.Name, store.QRCode, store.Email, store.Cellphone, passwordHash)
+	result, err := service.db.Create(s)
 	if err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
 		return
