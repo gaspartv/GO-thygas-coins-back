@@ -11,6 +11,7 @@ import (
 	"github.com/gaspartv/GO-thygas-coins-back/internal/service"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 
@@ -72,35 +73,44 @@ func main() {
 	c.Use(middleware.Logger)
 	c.Use(middleware.Recoverer)
 
-	c.With(middlewares.JwtMiddleware).Post("/account-loyalty", accLoyaltyService.Create)
-	c.Get("/account-loyalty/{id}", accLoyaltyService.Get)
-	c.With(middlewares.JwtMiddleware).Delete("/account-loyalty/{id}", accLoyaltyService.Delete)
-	c.Get("/account-loyalty", accLoyaltyService.List)
-	c.With(middlewares.JwtMiddleware).Put("/account-loyalty/{id}", accLoyaltyService.Update)
+	corsOptions := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	})
 
-	c.With(middlewares.JwtMiddleware).Post("/character", characterService.Create)
-	c.Get("/character/{id}", characterService.Get)
-	c.With(middlewares.JwtMiddleware).Delete("/character/{id}", characterService.Delete)
-	c.Get("/character", characterService.List)
-	c.With(middlewares.JwtMiddleware).Put("/character/{id}", characterService.Update)
+	c.Use(corsOptions.Handler)
 
-	c.With(middlewares.JwtMiddleware).Post("/store", storeService.Create)
-	c.Get("/store/{id}", storeService.Get)
-	c.With(middlewares.JwtMiddleware).Delete("/store/{id}", storeService.Delete)
-	c.Get("/store", storeService.List)
-	c.With(middlewares.JwtMiddleware).Put("/store/{id}", storeService.Update)
+	c.With(middlewares.JwtMiddleware).Post("/api-v1/account-loyalty", accLoyaltyService.Create)
+	c.Get("/api-v1/account-loyalty/{id}", accLoyaltyService.Get)
+	c.With(middlewares.JwtMiddleware).Delete("/api-v1/account-loyalty/{id}", accLoyaltyService.Delete)
+	c.Get("/api-v1/account-loyalty", accLoyaltyService.List)
+	c.With(middlewares.JwtMiddleware).Put("/api-v1/account-loyalty/{id}", accLoyaltyService.Update)
 
-	c.With(middlewares.JwtMiddleware).Post("/tibia-coins", tibiaCoinsService.Create)
-	c.Get("/tibia-coins/{id}", tibiaCoinsService.Get)
-	c.With(middlewares.JwtMiddleware).Delete("/tibia-coins/{id}", tibiaCoinsService.Delete)
-	c.Get("/tibia-coins", tibiaCoinsService.List)
-	c.With(middlewares.JwtMiddleware).Put("/tibia-coins/{id}", tibiaCoinsService.Update)
+	c.With(middlewares.JwtMiddleware).Post("/api-v1/character", characterService.Create)
+	c.Get("/api-v1/character/{id}", characterService.Get)
+	c.With(middlewares.JwtMiddleware).Delete("/api-v1/character/{id}", characterService.Delete)
+	c.Get("/api-v1/character", characterService.List)
+	c.With(middlewares.JwtMiddleware).Put("/api-v1/character/{id}", characterService.Update)
 
-	c.With(middlewares.JwtMiddleware).Post("/promotion", promotionService.Create)
-	c.Get("/promotion/{id}", promotionService.Get)
-	c.With(middlewares.JwtMiddleware).Delete("/promotion/{id}", promotionService.Delete)
-	c.Get("/promotion", promotionService.List)
-	c.With(middlewares.JwtMiddleware).Put("/promotion/{id}", promotionService.Update)
+	c.With(middlewares.JwtMiddleware).Post("/api-v1/store", storeService.Create)
+	c.Get("/api-v1/store", storeService.Get)
+	c.With(middlewares.JwtMiddleware).Delete("/api-v1/store/{id}", storeService.Delete)
+	c.With(middlewares.JwtMiddleware).Put("/api-v1/store/{id}", storeService.Update)
+
+	c.With(middlewares.JwtMiddleware).Post("/api-v1/tibia-coins", tibiaCoinsService.Create)
+	c.Get("/api-v1/tibia-coins/{id}", tibiaCoinsService.Get)
+	c.With(middlewares.JwtMiddleware).Delete("/api-v1/tibia-coins/{id}", tibiaCoinsService.Delete)
+	c.Get("/api-v1/tibia-coins", tibiaCoinsService.List)
+	c.With(middlewares.JwtMiddleware).Put("/api-v1/tibia-coins/{id}", tibiaCoinsService.Update)
+
+	c.With(middlewares.JwtMiddleware).Post("/api-v1/promotion", promotionService.Create)
+	c.Get("/api-v1/promotion/{id}", promotionService.Get)
+	c.With(middlewares.JwtMiddleware).Delete("/api-v1/promotion/{id}", promotionService.Delete)
+	c.Get("/api-v1/promotion", promotionService.List)
+	c.With(middlewares.JwtMiddleware).Put("/api-v1/promotion/{id}", promotionService.Update)
 
 	c.Post("/login", authService.Login)
 

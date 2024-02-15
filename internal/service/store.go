@@ -120,7 +120,7 @@ func (handler *StoreService) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := handler.db.Get(id); err != nil {
+	if _, err := handler.db.Get(); err != nil {
 		handlerError.Exec(w, "store not found", http.StatusNotFound)
 		return
 	}
@@ -143,29 +143,9 @@ func (handler *StoreService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *StoreService) Get(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		handlerError.Exec(w, "param id is required", http.StatusBadRequest)
-		return
-	}
-
-	result, err := handler.db.Get(id)
+	result, err := handler.db.Get()
 	if err != nil {
 		handlerError.Exec(w, "store not found", http.StatusNotFound)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (handler *StoreService) List(w http.ResponseWriter, r *http.Request) {
-	result, err := handler.db.List()
-	if err != nil {
-		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -183,7 +163,7 @@ func (handler *StoreService) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := handler.db.Get(id); err != nil {
+	if _, err := handler.db.Get(); err != nil {
 		handlerError.Exec(w, "store not found", http.StatusNotFound)
 		return
 	}

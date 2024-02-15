@@ -65,14 +65,14 @@ func (database *StoreDB) Update(id string, store *entity.Store) (string, error) 
 	return "updated successful", nil
 }
 
-func (database *StoreDB) Get(id string) (*entity.Store, error) {
-	stmt, err := database.db.Prepare("SELECT * FROM stores WHERE id =?")
+func (database *StoreDB) Get() (*entity.Store, error) {
+	stmt, err := database.db.Prepare("SELECT * FROM stores")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	row := stmt.QueryRow(id)
+	row := stmt.QueryRow()
 
 	var store entity.Store
 	if err := row.Scan(&store.ID, &store.Name, &store.QRCode, &store.Email, &store.Cellphone, &store.Password); err != nil {

@@ -40,12 +40,16 @@ func (service *PromotionService) Create(w http.ResponseWriter, r *http.Request) 
 		handlerError.Exec(w, "param max is required", http.StatusBadRequest)
 		return
 	}
+	if promotion.Stack == 0 {
+		handlerError.Exec(w, "param stack is required", http.StatusBadRequest)
+		return
+	}
 	if promotion.Price == 0 {
 		handlerError.Exec(w, "param price is required", http.StatusBadRequest)
 		return
 	}
 
-	p := entity.NewPromotion(promotion.Description, promotion.Min, promotion.Max, promotion.Price)
+	p := entity.NewPromotion(promotion.Description, promotion.Min, promotion.Max, promotion.Price, promotion.Stack)
 	result, err := service.db.Create(p)
 	if err != nil {
 		handlerError.Exec(w, err.Error(), http.StatusInternalServerError)
